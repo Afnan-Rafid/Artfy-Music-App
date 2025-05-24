@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artfy Streaming Service</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'responsive.css' %}" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#4a90e2" />
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="shortcut icon" href="{% static 'icons/favicon.ico' %}" type="image/x-icon">
+
+
+</head>
+
+<body style="margin:0; padding:0; background:#121212; font-family:Arial, sans-serif; color:#fff;">
+
+    <div class="sidebar" id="sidebar">
+        <!-- Spotify Logo -->
+        <div class="logo-container">
+            <img src="{% static 'images/artfy.png' %}" alt="Spotify Logo" style="width: 100%; height: auto; padding: 20px; box-sizing: border-box;">
+        </div>
+
+        <!-- Welcome User -->
+        <div class="sidebar-section">
+            <span style="margin-left: 14px;" class="sidebar-link-icon">👤</span>
+            <b>Welcome, {{ user.username }}</b>
+            <br>
+            <br>
+
+            <a href="{% url 'logout' %}">
+                <span class="sidebar-link-icon">↪️</span>
+                <b>Logout</b>
+            </a>
+        </div>
+
+        <!-- Top section of the sidebar -->
+        <div class="sidebar-section">
+            <a href="{% url 'home' %}" class="sidebar-link active">
+                <span class="sidebar-link-icon">🏠</span>
+                Home
+            </a>
+            <a href="{% url 'library' %}" class="sidebar-link">
+                <span class="sidebar-link-icon">🎵</span>
+                Your Library
+            </a>
+            <a href="{% url 'download' %}" class="sidebar-link">
+                <span class="sidebar-link-icon">⬇️</span>
+                Download
+            </a>
+        </div>
+    </div>
+
+{% block content %}
+{% endblock %}
+
+<script>
+    const sidebar = document.getElementById('sidebar')
+
+    function toggleSidebar() {
+        if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+            sidebar.style.display = 'block';
+        } else {
+            sidebar.style.display = 'none';
+        }
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register("{% static 'service-worker.js' %}")
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope:', registration.scope);
+        })
+        .catch(function(error) {
+          console.log('ServiceWorker registration failed:', error);
+        });
+    });
+  }
+</script>
+
+</body>

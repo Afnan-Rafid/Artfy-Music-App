@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+.animated {
+  overflow: hidden;
+  width: 11rem;
+  white-space: nowrap;
+}
+
+.animated > * {
+  display: inline-block;
+  position: relative;
+  animation: 5s linear 0s infinite alternate move;
+}
+
+.animated > *.min {
+  min-width: 100%;
+}
+
+@keyframes move {
+  0%,
+  25% {
+    transform: translateX(0%);
+    left: 0%;
+  }
+  75%,
+  100% {
+    transform: translateX(-100%);
+    left: 100%;
+  }
+}
+
+.song-add{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.song-add h1{
+   color: white;
+   font-size: 20px;
+}
+
+.dot{
+  margin-left: 20px;
+
+}
+.dropdown {
+  position: absolute;
+  background: #222;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10;
+  right: 60px;
+  top: 30px;
+  display: none;
+  
+
+}
+
+.dropdown a {
+  color: white;
+  text-decoration: none;
+  display: block;
+}
+
+.ic i{
+  color: white;
+  font-size: 20px;
+  margin-left: 40px;
+}
+
+
+</style>
+
+<div class="div1" >
+        <header class="header-container">
+            <form method="GET" action="{% url 'home' %}" class="search-bar">
+                <button type="submit" aria-label="Search">🔍</button>
+                <input type="search" name="q" placeholder="What do you want to listen to?" aria-label="Search">
+                <a href="javascript:void(0);" onclick="toggleSidebar()"><i class='bx bx-menu'></i></a>
+            </form>
+
+            <div class="search-title">All Songs</div>
+        </header>
+
+
+        <main>
+            <section class="song-section" >
+                <!-- Artist Card -->
+                {% for song in songs %}    
+                <div class="artist-card">
+                    <a href="{% url 'music' slug=song.slug %}"><img src="{{ song.cover_image.url|default_if_none:'/static/images/default-cover.png' }}" alt="img">
+</a>
+                    <div class="artist-info">
+                        <div class="artist-name animated"><span>{{song.title}}</span></div>
+                        <div class="artist-title">{{song.artist}}</div>
+                    </div>
+                    <a class="ic" href="javascript:void(0);" onclick="toggleDropdown(this)">
+                        <i id="ic" class='bx bx-dots-vertical-rounded'></i>
+                    </a>
+                    <div class="dropdown" >
+                        <a href="{% url 'delete' song.slug %}">Delete Song</a>
+                    </div>
+                  </div>
+                {% endfor %}    
+              </section>
+              <div class="song-add">
+                <a href="{% url 'upload' %}"><img src="{% static 'images/plus1.png' %}" alt="Rema" style="width:100px; height:100px; border-radius:50%;"></a>
+                  
+                <h1>Add Song</h1>
+                  
+              </div>    
+        </main>
+
+    </div>
+<script>
+function toggleDropdown(button) {
+    const dropdown = button.nextElementSibling;
+    dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.4/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-black h-screen flex flex-col items-center justify-center">
+  <div class="w-full max-w-xs px-6">
+    <div class="mb-10 flex flex-col items-center">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1024px-Spotify_logo_without_text.svg.png" alt="Spotify Logo" class="w-20 h-20">
+      <h1 class="text-4xl text-white font-bold mt-2">Spotify</h1>
+    </div>
+
+
+    <form method="POST" enctype="multipart/form-data" class="bg-black">
+      {% csrf_token %}
+      <div class="mb-4">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" name="title" type="text" placeholder="Title">
+      </div>
+      <div class="mb-4">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" name="artist" type="text" placeholder="Artist">
+      </div>
+      <div class="mb-4">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" name="duration" type="text" placeholder="Duration">
+      </div>
+      <div class="mb-4">
+        <input type="file" class="form-control" name="cover_image" id="image" accept="image/*">
+      </div>
+      <div class="mb-4">
+        <input type="file" id="fileInput"  accept="audio/mp3, audio/mpeg" name="audio_file" placeholder="Audio" >
+      </div>
+      <button type="submit" class="bg-green-500 text-white rounded py-2 px-4">Upload</button>
+    </form>
+
+    <p class="text-center text-gray-500 text-xs mt-4">
+      &copy; Spotify
+    </p>
+  </div>
+</body>
+</html>
