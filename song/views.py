@@ -13,7 +13,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-
+from cloudinary.uploader import upload as cloudinary_upload
+from cloudinary.utils import cloudinary_url
 # Create your views here.
 
 def index(request):
@@ -90,26 +91,33 @@ def upload(request):
         title = request.POST.get('title')
         artist = request.POST.get('artist')
         duration_str = request.POST.get('duration')
-        cover_image = request.FILES.get('cover_image')
-        audio_file = request.FILES.get('audio_file')
+        cover_image_file = request.FILES.get('cover_image')
+        audio_file_file = request.FILES.get('audio_file')
 
         duration = None
         if duration_str:
             try:
                 mins, secs = map(int, duration_str.split(':'))
                 duration = timedelta(minutes=mins, seconds=secs)
-            except Exception as e:
-                # You can log or handle invalid format here
+            except:
                 duration = None
 
-        song = Song(
+        # Upload to Cloudinary
+        cover_image_url = None
+        if cover_image_file:
+            cover_upload = cloudinary_upload(cover_image_file, folder="cover_images")
+            cover_image_url = cover_upload['secure_url']
+
+        audio_upload = cloudinary_upload(audio_file_file, resource_type="video", folder="audio_files")
+        audio_file_url = audio_upload['secure_url']
+
+        song = Song.objects.create(
             title=title,
             artist=artist,
-            duration=duration,  # Must be timedelta or None
-            cover_image=cover_image,
-            audio_file=audio_file,
+            duration=duration,
+            cover_image=cover_image_url,
+            audio_file=audio_file_url,
         )
-        song.save()
         return redirect('home')
 
     return render(request, 'upload.html')
@@ -183,12 +191,22 @@ def download_youtube_song(request):
             mp3_final_path = os.path.join(songs_dir, mp3_filename)
             os.rename(mp3_temp_path, mp3_final_path)
 
+            with open(full_cover_path, 'rb') as f:
+                cover_upload = cloudinary_upload(f, folder="cover_images")
+            cover_image_url = cover_upload['secure_url']
+
+            # Upload MP3 to Cloudinary
+            with open(mp3_final_path, 'rb') as f:
+                audio_upload = cloudinary_upload(f, resource_type="video", folder="audio_files")
+            audio_file_url = audio_upload['secure_url']
+
+
             # ---------------- Save Song ----------------
             song = Song.objects.create(
                 title=title,
                 artist=artist,
-                audio_file=os.path.join('songs', mp3_filename),
-                cover_image=cover_path,
+                audio_file=audio_file_url,
+                cover_image=cover_image_url,
                 slug=slug,
                 duration=duration,
             )

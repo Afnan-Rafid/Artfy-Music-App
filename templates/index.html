@@ -94,7 +94,7 @@
                 <!-- Artist Card -->
                 {% for song in songs %}    
                 <div class="artist-card">
-                    <a href="{% url 'music' slug=song.slug %}"><img src="{{ song.cover_image.url|default_if_none:'/static/images/default-cover.png' }}" alt="img">
+                    <a href="{% url 'music' slug=song.slug %}"><img src="{{ song.cover_image|default_if_none:'/static/images/default-cover.png' }}" alt="img">
 </a>
                     <div class="artist-info">
                         <div class="artist-name animated"><span>{{song.title}}</span></div>
@@ -116,6 +116,8 @@
                   
               </div>    
         </main>
+
+
 
     </div>
 <script>

@@ -11,7 +11,7 @@
         </div>
         <!-- Music Player Interface -->
         <div class="player-container">
-            <img class="album-cover" src="{{ song.cover_image.url }}" alt="Album Cover">
+            <img class="album-cover" src="{{ song.cover_image }}" alt="Album Cover">
             <div class="song-info">
                 <h2 class="song-title">{{ song.title }}</h2>
                 <h3 class="artist-name">{{ song.artist }}</h3>
@@ -38,7 +38,7 @@
             </div>
         </div>
     
-        <audio id="audio-player" src="{{ song.audio_file.url }}"></audio>
+        <audio id="audio-player" src="{{ song.audio_file }}"></audio>
 </div>
 
 <script>

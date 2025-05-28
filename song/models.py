@@ -6,8 +6,11 @@ class Song(models.Model):
     title = models.CharField(max_length=100, blank=True)
     artist = models.CharField(max_length=100, blank=True)
     duration = models.DurationField(blank=True, null=True)
-    cover_image = models.ImageField(upload_to='cover_images/', blank=True, null=True, default='cover_images/default-cover.jpg')
-    audio_file = models.FileField(upload_to='audio_files/')
+    
+    # Cloudinary paths will auto-handle folders by prefix
+    cover_image = models.URLField(blank=True, null=True)
+    audio_file = models.URLField()
+    
     slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
@@ -18,7 +21,7 @@ class Song(models.Model):
             base_slug = slugify(self.title)
             slug = base_slug
             count = 1
-            # Ensure slug uniqueness
+            # Ensure slug is unique
             while Song.objects.filter(slug=slug).exists():
                 slug = f"{base_slug}-{count}"
                 count += 1
