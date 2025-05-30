@@ -134,6 +134,7 @@ def download_youtube_song(request):
             return render(request, 'download.html', {'error': 'Please enter a YouTube URL.'})
 
         try:
+            # ---------------- Prepare Directories ----------------
             temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
             os.makedirs(temp_dir, exist_ok=True)
 
@@ -143,9 +144,17 @@ def download_youtube_song(request):
             cover_dir = os.path.join(settings.MEDIA_ROOT, 'cover_images')
             os.makedirs(cover_dir, exist_ok=True)
 
-            # Path to cookies file
+            # ---------------- Handle Cookies ----------------
+            cookie_env = os.environ.get("YOUTUBE_COOKIES")
             cookie_file_path = os.path.join(settings.BASE_DIR, 'youtube_cookies.txt')
 
+            if cookie_env:
+                with open(cookie_file_path, "w", encoding="utf-8") as f:
+                    f.write(cookie_env)
+            else:
+                raise Exception("YOUTUBE_COOKIES environment variable not set.")
+
+            # ---------------- yt-dlp Options ----------------
             ydl_opts = {
                 'format': 'bestaudio/best',
                 'outtmpl': os.path.join(temp_dir, '%(title)s-%(id)s.%(ext)s'),
@@ -156,9 +165,10 @@ def download_youtube_song(request):
                 }],
                 'quiet': True,
                 'no_warnings': True,
-                'cookies': cookie_file_path,  # <-- Use cookies for auth
+                'cookies': cookie_file_path,
             }
 
+            # ---------------- Download Audio ----------------
             with YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(youtube_url, download=True)
                 title = info_dict.get('title', 'unknown_title')
@@ -182,7 +192,7 @@ def download_youtube_song(request):
             with open(full_cover_path, 'wb') as f:
                 f.write(response.content)
 
-            # ---------------- Audio File ----------------
+            # ---------------- Move MP3 ----------------
             mp3_temp_path = None
             for file in os.listdir(temp_dir):
                 if file.endswith(".mp3") and video_id in file:
@@ -209,7 +219,7 @@ def download_youtube_song(request):
                 audio_upload = cloudinary_upload(f, resource_type="video", folder="audio_files")
             audio_file_url = audio_upload['secure_url']
 
-            # ---------------- Save Song ----------------
+            # ---------------- Save to DB ----------------
             song = Song.objects.create(
                 title=title,
                 artist=artist,
