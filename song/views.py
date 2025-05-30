@@ -166,7 +166,8 @@ def download_youtube_song(request):
                 'quiet': True,
                 'no_warnings': True,
                 'cookies': cookie_file_path,
-                'proxy': 'http://103.216.82.215:6667',
+                'proxy': 'http://47.236.224.32:8080',
+                'timeout': 10,
             }
 
             # ---------------- Download Audio ----------------
