@@ -143,6 +143,9 @@ def download_youtube_song(request):
             cover_dir = os.path.join(settings.MEDIA_ROOT, 'cover_images')
             os.makedirs(cover_dir, exist_ok=True)
 
+            # Path to cookies file
+            cookie_file_path = os.path.join(settings.BASE_DIR, 'youtube_cookies.txt')
+
             ydl_opts = {
                 'format': 'bestaudio/best',
                 'outtmpl': os.path.join(temp_dir, '%(title)s-%(id)s.%(ext)s'),
@@ -153,6 +156,7 @@ def download_youtube_song(request):
                 }],
                 'quiet': True,
                 'no_warnings': True,
+                'cookies': cookie_file_path,  # <-- Use cookies for auth
             }
 
             with YoutubeDL(ydl_opts) as ydl:
@@ -165,7 +169,7 @@ def download_youtube_song(request):
 
             slug = generate_unique_slug(title)
 
-            # ---------------- Cover Image from Thumbnail ----------------
+            # ---------------- Cover Image ----------------
             thumbnail_url = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
             response = requests.get(thumbnail_url)
             if response.status_code != 200:
@@ -178,9 +182,14 @@ def download_youtube_song(request):
             with open(full_cover_path, 'wb') as f:
                 f.write(response.content)
 
-            # ---------------- Audio File Handling ----------------
-            mp3_temp_path = os.path.join(temp_dir, f"{slug}-{info_dict['id']}.mp3")
-            if not os.path.exists(mp3_temp_path):
+            # ---------------- Audio File ----------------
+            mp3_temp_path = None
+            for file in os.listdir(temp_dir):
+                if file.endswith(".mp3") and video_id in file:
+                    mp3_temp_path = os.path.join(temp_dir, file)
+                    break
+
+            if not mp3_temp_path:
                 files = [f for f in os.listdir(temp_dir) if f.endswith('.mp3')]
                 if files:
                     mp3_temp_path = os.path.join(temp_dir, files[0])
@@ -191,15 +200,14 @@ def download_youtube_song(request):
             mp3_final_path = os.path.join(songs_dir, mp3_filename)
             os.rename(mp3_temp_path, mp3_final_path)
 
+            # ---------------- Upload to Cloudinary ----------------
             with open(full_cover_path, 'rb') as f:
                 cover_upload = cloudinary_upload(f, folder="cover_images")
             cover_image_url = cover_upload['secure_url']
 
-            # Upload MP3 to Cloudinary
             with open(mp3_final_path, 'rb') as f:
                 audio_upload = cloudinary_upload(f, resource_type="video", folder="audio_files")
             audio_file_url = audio_upload['secure_url']
-
 
             # ---------------- Save Song ----------------
             song = Song.objects.create(
