@@ -8,6 +8,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('upload/', views.upload, name='upload'),
     path('download/', views.download_youtube_song, name='download'),
+
+
     path('library/', views.library, name='library'),
     path('delete/<slug:slug>/', views.delete, name='delete'),
 

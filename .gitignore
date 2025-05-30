@@ -1,4 +1,4 @@
 venv/
 media/
 .env
-youtube_cookies.txt
+staticfiles
