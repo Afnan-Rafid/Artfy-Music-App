@@ -168,6 +168,7 @@ def download_youtube_song(request):
                 'cookies': cookie_file_path,
                 'proxy': 'http://217.15.164.63:3128',
                 'timeout': 10,
+                'max_filesize': 10 * 1024 * 1024, 
             }
 
             # ---------------- Download Audio ----------------
